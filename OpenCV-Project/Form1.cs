@@ -34,7 +34,7 @@ namespace OpenCV_Project
                     //마우스가 가리키는 좌표와 실제 사진의 좌표가 일치하지 않아 일치하도록 좌표를 변경시켜 줌
                     p.X = map.Width * e.X / pictureBox1.Width;
                     p.Y = map.Height * e.Y / pictureBox1.Height;
-                    pictureBox1.Image = mosaicImage(map, trackBar1.Value, p.X, p.Y,trackBar2.Value); //(모자이크 할 이미지, 모자이크 크기, X좌표, Y좌표, 모자이크 범위)
+                    pictureBox1.Image = mosaicImage(map, trackBar1.Value, p.X, p.Y,trackBar2.Value, trackBar2.Value); //(모자이크 할 이미지, 모자이크 크기, X좌표, Y좌표, 모자이크 범위)
                 }
                 catch
                 {
@@ -56,7 +56,7 @@ namespace OpenCV_Project
                 //마우스가 가리키는 좌표와 실제 사진의 좌표가 일치하지 않아 일치하도록 좌표를 변경시켜 줌
                 p.X = b.Width * e.X / pictureBox1.Width;
                 p.Y = b.Height * e.Y / pictureBox1.Height;
-                pictureBox1.Image = mosaicImage( b, trackBar1.Value, p.X, p.Y, trackBar2.Value); //(모자이크 할 이미지, 모자이크 크기, X좌표, Y좌표, 모자이크 범위)
+                pictureBox1.Image = mosaicImage( b, trackBar1.Value, p.X, p.Y, trackBar2.Value, trackBar2.Value); //(모자이크 할 이미지, 모자이크 크기, X좌표, Y좌표, 모자이크 범위)
             }
         }
 
@@ -90,7 +90,7 @@ namespace OpenCV_Project
             Rect[] faces = faceCascade.DetectMultiScale(mat);
             foreach (var item in faces)
             {
-                facemosaicImage(b, trackBar1.Value, item.X, item.Y, item.Width, item.Height);
+                mosaicImage(b, trackBar1.Value, item.X, item.Y, item.Width, item.Height);
             }
             pictureBox1.Image = b;
         }
@@ -137,49 +137,8 @@ namespace OpenCV_Project
             }
             return bitmap;
         }
-        public static Image mosaicImage(System.Drawing.Bitmap bitmap, int effectWidth, int x, int y, int value)
-        {
-            for (int heightOfffset = y; (heightOfffset < y+value && heightOfffset<bitmap.Height); heightOfffset += effectWidth)
-            {
-                for (int widthOffset = x; (widthOffset < x+value && widthOffset<bitmap.Width); widthOffset += effectWidth)
-                {
-                    int avgR = 0, avgG = 0, avgB = 0;
-                    int blurPixelCount = 0;
-
-                    for (int i = widthOffset; (i < widthOffset + effectWidth && i < x+value && i<bitmap.Width); i++)
-                    {
-                        for (int j = heightOfffset; (j < heightOfffset + effectWidth && j < y+value && j<bitmap.Height); j++)
-                        {
-                            System.Drawing.Color pixel = bitmap.GetPixel(i, j);
-
-                            avgR += pixel.R;
-                            avgG += pixel.G;
-                            avgB += pixel.B;
-
-                            blurPixelCount++;
-                        }
-                    }
-
-                    // 픽셀 RGB값의 평균값 구하기
-                    avgR = avgR / blurPixelCount;
-                    avgG = avgG / blurPixelCount;
-                    avgB = avgB / blurPixelCount;
-
-
-                    //  위에서 구한 RGB 평균값을 범위 내 모든 픽셀에 적용
-                    for (int i = widthOffset; (i < widthOffset + effectWidth && i < x+value && i<bitmap.Width); i++)
-                    {
-                        for (int j = heightOfffset; (j < heightOfffset + effectWidth && j < y+value && j<bitmap.Height); j++)
-                        {
-                            System.Drawing.Color newColor = System.Drawing.Color.FromArgb(avgR, avgG, avgB);
-                            bitmap.SetPixel(i, j, newColor);
-                        }
-                    }
-                }
-            }
-            return bitmap;
-        }
-        public static Image facemosaicImage(System.Drawing.Bitmap bitmap, int effectWidth, int x, int y, int width, int height)
+        
+        public static Image mosaicImage(System.Drawing.Bitmap bitmap, int effectWidth, int x, int y, int width, int height)
         {
             for (int heightOfffset = y; (heightOfffset < y + height && heightOfffset < bitmap.Height); heightOfffset += effectWidth)
             {
